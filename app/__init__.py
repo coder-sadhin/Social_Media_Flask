@@ -3,11 +3,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
+from flask_mail import Mail
 
 # Initialize extensions (global)
 db = SQLAlchemy()
 migrate = Migrate()
 bcrypt = Bcrypt()
+mail = Mail()
 login_manager = LoginManager()
 
 def create_app():
@@ -24,6 +26,9 @@ def create_app():
     migrate.init_app(app, db)
     bcrypt.init_app(app)
     login_manager.init_app(app)
+
+    # Initialize mail with app
+    mail.init_app(app)
 
     # Login manager config
     login_manager.login_view = "auth.login"

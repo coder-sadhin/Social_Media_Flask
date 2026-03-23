@@ -3,6 +3,7 @@ from flask_login import login_user, logout_user, login_required
 from app.models.user import User
 from app import db
 from app.utils.security import hash_password, check_password
+from app.utils.token import verify_token
 
 auth = Blueprint("auth", __name__)
 
@@ -60,18 +61,62 @@ def logout():
     return redirect(url_for("auth.login"))
 
 # start function for forget password
-@auth.route("/forget-password", methods=["GET", "POST"])
-def forget_password():
+@auth.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
     if request.method == "POST":
         email = request.form["email"]
 
         user = User.query.filter_by(email=email).first()
-        if not user:
-            flash("Email not found")
-            return redirect(url_for("auth.forget_password"))
 
-        # TODO: Send reset email (implement this part)
-        flash("Password reset email sent")
+        if user:
+            from app.services.email_service import send_reset_email
+            send_reset_email(user)
+
+        flash("If email exists, a reset link has been sent")
+
+    return render_template("auth/forgot_password.html")
+
+@auth.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+    email = verify_token(token)
+
+    if not email:
+        flash("Invalid or expired token")
+        return redirect(url_for("auth.forgot_password"))
+
+    user = User.query.filter_by(email=email).first()
+
+    if request.method == "POST":
+        password = request.form["password"]
+
+        user.password_hash = hash_password(password)
+        db.session.commit()
+
+        flash("Password updated successfully")
         return redirect(url_for("auth.login"))
 
-    return render_template("auth/forget_password.html")
+    return render_template("auth/reset_password.html")
+
+@auth.route("/change-password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    if request.method == "POST":
+        current = request.form["current_password"]
+        new = request.form["new_password"]
+        confirm = request.form["confirm_password"]
+
+        if not check_password(current_user.password_hash, current):
+            flash("Wrong current password")
+            return redirect(url_for("auth.change_password"))
+
+        if new != confirm:
+            flash("Passwords do not match")
+            return redirect(url_for("auth.change_password"))
+
+        current_user.password_hash = hash_password(new)
+        db.session.commit()
+
+        flash("Password changed successfully")
+        return redirect(url_for("main.home"))
+
+    return render_template("auth/change_password.html")
