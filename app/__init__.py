@@ -26,11 +26,11 @@ def create_app():
     migrate.init_app(app, db)
     bcrypt.init_app(app)
     login_manager.init_app(app)
-
-    from app.models import user  # Ensure this path matches your project structure
+ # Ensure this path matches your project structure
 
     @login_manager.user_loader
     def load_user(user_id):
+        from app.models.user import User
         return User.query.get(int(user_id))
 
     # Initialize mail with app

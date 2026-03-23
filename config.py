@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    # SECRET_KEY = "secret"
+    SECRET_KEY = "dev-key-for-now-but-change-it-later"
 
     SQLALCHEMY_DATABASE_URI = "sqlite:///site.db"
 
