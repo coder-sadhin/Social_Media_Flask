@@ -45,7 +45,10 @@ def login():
         user = User.query.filter_by(email=email).first()
 
         if user and check_password(user.password_hash, password):
-            login_user(user)
+
+            remember = True if request.form.get("remember") else False
+
+            login_user(user, remember=remember)
             return redirect(url_for("main.home"))
 
         flash("Invalid credentials")
