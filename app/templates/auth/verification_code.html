@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Verify Code{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex flex-col justify-center items-center px-4">
+    <div class="bg-white p-8 md:p-12 rounded-2xl shadow-xl w-full max-w-[500px] border border-gray-100 text-center">
+        
+        <div class="mx-auto w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center border border-blue-100 mb-6 text-blue-600">
+            <i class="fas fa-envelope-open-text text-2xl"></i>
+        </div>
+        
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Check your email</h1>
+        <p class="text-gray-500 mb-8">
+            We sent a 4-digit code to <br>
+            <span class="font-semibold text-gray-800">{{ email }}</span>
+        </p>
+
+        <form action="{{ url_for('auth.verify_code') }}" method="POST" id="otp-form">
+            <div class="flex justify-center gap-3 mb-8">
+                <input type="text" name="code1" maxlength="1" pattern="\d*" inputmode="numeric" required 
+                    class="otp-input w-16 h-20 text-center text-4xl font-bold border-2 border-gray-200 rounded-xl bg-gray-50 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all">
+                <input type="text" name="code2" maxlength="1" pattern="\d*" inputmode="numeric" required 
+                    class="otp-input w-16 h-20 text-center text-4xl font-bold border-2 border-gray-200 rounded-xl bg-gray-50 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all">
+                <input type="text" name="code3" maxlength="1" pattern="\d*" inputmode="numeric" required 
+                    class="otp-input w-16 h-20 text-center text-4xl font-bold border-2 border-gray-200 rounded-xl bg-gray-50 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all">
+                <input type="text" name="code4" maxlength="1" pattern="\d*" inputmode="numeric" required 
+                    class="otp-input w-16 h-20 text-center text-4xl font-bold border-2 border-gray-200 rounded-xl bg-gray-50 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all">
+            </div>
+
+            <button type="submit" 
+                class="w-full bg-blue-600 text-white font-semibold py-3.5 rounded-xl text-lg hover:bg-blue-700 shadow-lg shadow-blue-100 transition transform active:scale-[0.98]">
+                Verify Code
+            </button>
+        </form>
+
+        <div class="mt-8 space-y-4">
+            <p class="text-sm text-gray-500">
+                Didn't receive the email? 
+                <a href="{{ url_for('auth.resend_code') }}" class="font-bold text-blue-600 hover:text-blue-800 transition">Click to resend</a>
+            </p>
+            
+            <a href="{{ url_for('auth.forgot_password') }}" class="flex items-center justify-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-800 transition">
+                <i class="fas fa-arrow-left"></i> Back to email entry
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const inputs = document.querySelectorAll('.otp-input');
+    
+    inputs.forEach((input, index) => {
+        // Handle typing numbers
+        input.addEventListener('input', (e) => {
+            if (e.inputType === "deleteContentBackward") return;
+            if (input.value && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+            }
+        });
+
+        // Handle Backspace
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !input.value && index > 0) {
+                inputs[index - 1].focus();
+            }
+        });
+
+        // Prevent non-numeric characters
+        input.addEventListener('keypress', (e) => {
+            if (!/[0-9]/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+{% endblock %}

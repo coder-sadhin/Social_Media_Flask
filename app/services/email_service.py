@@ -1,25 +1,51 @@
+# from flask_mail import Message
+# from app import mail
+# from flask import url_for
+
+# def send_reset_email(user):
+#     from app.utils.token import generate_token
+
+#     token = generate_token(user.email)
+
+#     reset_url = url_for("auth.reset_password", token=token, _external=True)
+
+#     msg = Message(
+#         subject="Password Reset Request",
+#         recipients=[user.email]
+#     )
+
+#     msg.body = f"""
+#     To reset your password, click the link below:
+
+#     {reset_url}
+
+#     If you did not request this, ignore this email.
+#     """
+
+#     mail.send(msg)
+
+import random
 from flask_mail import Message
+from flask import session
 from app import mail
-from flask import url_for
 
-def send_reset_email(user):
-    from app.utils.token import generate_token
-
-    token = generate_token(user.email)
-
-    reset_url = url_for("auth.reset_password", token=token, _external=True)
+def send_verification_code(user):
+    # Generate a random 4-digit code
+    code = f"{random.randint(1000, 9999)}"
+    
+    # Store the code and email in the session to verify later
+    session['temp_code'] = code
+    session['reset_email'] = user.email
 
     msg = Message(
-        subject="Password Reset Request",
+        subject="Your Verification Code",
         recipients=[user.email]
     )
 
     msg.body = f"""
-    To reset your password, click the link below:
+    Your password reset verification code is: {code}
 
-    {reset_url}
-
-    If you did not request this, ignore this email.
+    If you did not request this, please ignore this email.
     """
 
     mail.send(msg)
