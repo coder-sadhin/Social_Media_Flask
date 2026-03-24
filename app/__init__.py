@@ -1,8 +1,8 @@
-from flask import Flask
+from flask import Flask, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from flask_mail import Mail
 
 # Initialize extensions (global)
@@ -44,5 +44,20 @@ def create_app():
     # Register all routes
     from .routes import register_blueprints
     register_blueprints(app)
+
+    # --- THE SECURITY GUARD START ---
+    @app.before_request
+    def restrict_access():
+        auth_routes = ['auth.login', 'auth.register', 'auth.forgot_password', 'auth.verify_code', 'auth.set_new_password', 'auth.resend_code']
+        
+        # 1. Skip check for static files (CSS, JS, Images)
+        if request.endpoint == 'static':
+            return
+
+        # 2. If user is ALREADY logged in and tries to go to Login/Register
+        if current_user.is_authenticated and request.endpoint in auth_routes:
+            return redirect(url_for('main.home')) # Redirect to their feed
+            
+    # --- THE SECURITY GUARD END ---
 
     return app

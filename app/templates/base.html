@@ -66,7 +66,7 @@
                 {% if current_user.is_authenticated %}
                     <div class="flex items-center gap-2 p-1 pr-3 hover:bg-gray-200 rounded-full cursor-pointer transition group">
                         <div class="w-8 h-8 rounded-full bg-[#E4E6EB] flex items-center justify-center overflow-hidden shrink-0 relative">
-                            {% if current_user.profile_image %}
+                            {% if current_user.profile_image and current_user.profile_image != 'default.png' %}
                                 <img src="{{ url_for('static', filename='profile_pics/' + current_user.profile_image) }}" 
                                     class="w-full h-full object-cover">
                             {% else %}
