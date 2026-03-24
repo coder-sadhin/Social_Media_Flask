@@ -26,7 +26,7 @@
 
 import random
 from flask_mail import Message
-from flask import session, current_app
+from flask import session, current_app, render_template
 from app import mail
 
 def send_verification_code(user):
@@ -42,11 +42,18 @@ def send_verification_code(user):
         recipients=[user.email],
         sender=current_app.config.get('MAIL_USERNAME'),
     )
+    msg.body = f"Your verification code is: {code}"
 
-    msg.body = f"""
-    Your password reset verification code is: {code}
 
-    If you did not request this, please ignore this email.
-    """
+    msg.html = render_template(
+        'emails/verify_code.html', 
+        name=user.name, 
+        otp_code=code
+    )
 
-    mail.send(msg)
+    try:
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        return False

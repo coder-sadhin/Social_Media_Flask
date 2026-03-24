@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Verification Code</title>
+    <style>
+        body { margin: 0; padding: 0; background-color: #f0f2f5; font-family: 'SF Pro Text', Helvetica, Arial, sans-serif; }
+        .wrapper { width: 100%; table-layout: fixed; background-color: #f0f2f5; padding-top: 40px; padding-bottom: 40px; }
+        .main { background-color: #ffffff; margin: 0 auto; width: 100%; max-width: 500px; border-radius: 8px; border: 1px solid #dddfe2; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header { padding: 20px; border-bottom: 1px solid #e5e5e5; text-align: left; }
+        .logo { color: #1877f2; font-size: 24px; font-weight: bold; text-decoration: none; }
+        .content { padding: 30px; text-align: left; }
+        .title { font-size: 20px; font-weight: bold; color: #1c1e21; margin-bottom: 16px; }
+        .text { font-size: 16px; color: #4b4f56; line-height: 1.5; margin-bottom: 24px; }
+        
+        /* The Code Box */
+        .code-container { background-color: #f5f6f7; border: 1px solid #dddfe2; border-radius: 6px; padding: 20px; text-align: center; margin-bottom: 24px; }
+        .code-text { font-size: 32px; font-weight: bold; color: #1c1e21; letter-spacing: 4px; font-family: monospace; }
+        
+        .footer { padding: 20px; text-align: center; font-size: 12px; color: #90949c; }
+        .footer a { color: #1877f2; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <center class="wrapper">
+        <table class="main" cellpadding="0" cellspacing="0">
+            <tr>
+                <td class="header">
+                    <span class="logo">socialmedia</span>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="content">
+                    <div class="title">Confirm your email address</div>
+                    <div class="text">
+                        Hi {{ name }},<br><br>
+                        You recently registered for SocialMedia. To complete your registration, please use the verification code below:
+                    </div>
+
+                    <div class="code-container">
+                        <span class="code-text">{{ otp_code }}</span>
+                    </div>
+
+                    <div class="text" style="font-size: 14px;">
+                        This code will expire in 15 minutes. If you didn't request this, you can safely ignore this email.
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="footer">
+            <p>Sent by SocialMedia Inc.</p>
+            <p>1601 Willow Road, Menlo Park, CA 94025</p>
+            <p>To help keep your account secure, please don't forward this email.</p>
+        </div>
+    </center>
+</body>
+</html>
