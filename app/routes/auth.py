@@ -4,7 +4,6 @@ from app.models.user import User
 from app import db
 from app.utils.security import hash_password, check_password
 from app.utils.token import verify_token
-from app import limiter
 
 auth = Blueprint("auth", __name__)
 
@@ -59,11 +58,8 @@ def register():
             return redirect(url_for("auth.register"))
         except Exception as e:
             db.session.rollback()
-            # Log the actual error for debugging
-            # current_app.logger.error(f"Registration Error: {e}")
             flash("Something went wrong. Please try again later.", "danger")
             return redirect(url_for("auth.register"))
-
     return render_template("auth/register.html")
 
 # start function for login 
@@ -164,7 +160,6 @@ def verify_code():
 
 # function for resend code
 @auth.route("/resend-code")
-@limiter.limit("3 per hour") # Prevent spamming your email server
 def resend_code():
     email = session.get('reset_email')
     if not email:
@@ -207,6 +202,56 @@ def resend_code():
 #         return redirect(url_for("auth.login"))
 
 #     return render_template("auth/reset_password.html")
+
+
+# function for set new password
+@auth.route("/set-new-password", methods=["GET", "POST"])
+def set_new_password():
+    # SECURITY: If they haven't verified the 4-digit code, kick them out
+    if not session.get('code_verified'):
+        flash("Please verify your code first.", "warning")
+        return redirect(url_for("auth.forgot_password"))
+
+    if request.method == "POST":
+        password = request.form.get("password")
+        confirm_password = request.form.get("confirm_password")
+        email = session.get('reset_email')
+
+        # 1. Validation
+        if not password or len(password) < 8:
+            flash("Password must be at least 8 characters long.", "danger")
+            return render_template("auth/set_new_password.html")
+
+        if password != confirm_password:
+            flash("Passwords do not match.", "danger")
+            return render_template("auth/set_new_password.html")
+
+        # 2. Update Database
+        user = User.query.filter_by(email=email).first()
+        if user:
+            try:
+                from app.utils.security import hash_password # Use your hashing helper
+                user.password_hash = hash_password(password)
+                db.session.commit()
+
+                # 3. Cleanup Session (Very important!)
+                session.pop('temp_code', None)
+                session.pop('reset_email', None)
+                session.pop('code_verified', None)
+
+                flash("Password reset successful! You can now log in.", "success")
+                return redirect(url_for("auth.login"))
+            except Exception as e:
+                db.session.rollback()
+                current_app.logger.error(f"Password Update Error: {e}")
+                flash("An error occurred while updating your password.", "danger")
+        else:
+            flash("User not found.", "danger")
+            return redirect(url_for("auth.forgot_password"))
+
+    return render_template("auth/set_new_password.html")
+
+
 
 @auth.route("/change-password", methods=["GET", "POST"])
 @login_required
