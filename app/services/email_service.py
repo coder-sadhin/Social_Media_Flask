@@ -26,7 +26,7 @@
 
 import random
 from flask_mail import Message
-from flask import session
+from flask import session, current_app
 from app import mail
 
 def send_verification_code(user):
@@ -39,7 +39,8 @@ def send_verification_code(user):
 
     msg = Message(
         subject="Your Verification Code",
-        recipients=[user.email]
+        recipients=[user.email],
+        sender=current_app.config.get('MAIL_USERNAME'),
     )
 
     msg.body = f"""

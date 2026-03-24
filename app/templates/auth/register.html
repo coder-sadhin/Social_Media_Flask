@@ -1,43 +1,73 @@
 {% extends "base.html" %}
-
 {% block title %}Create Account{% endblock %}
 
 {% block content %}
 <div class="flex flex-col items-center justify-center min-h-[80vh] p-4">
-    <div class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-[430px] border border-gray-200">
-        <div class="mb-4 border-b pb-4">
-            <h2 class="text-2xl font-bold">Sign Up</h2>
-            <p class="text-gray-600 text-sm">Join the community today.</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="mb-4 p-3 rounded-md w-full max-w-[430px] {% if category == 'danger' %}bg-red-100 text-red-700 border border-red-200{% else %}bg-blue-100 text-blue-700 border border-blue-200{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg w-full max-w-[430px] border border-gray-200">
+        <div class="mb-6 border-b pb-4 text-center">
+            <h2 class="text-3xl font-bold text-gray-800">Sign Up</h2>
+            <p class="text-gray-500 text-sm mt-1">Join the community today.</p>
         </div>
 
         <form action="{{ url_for('auth.register') }}" method="POST" class="space-y-4">
             <div class="flex gap-3">
-                <input type="text" name="name" placeholder="Full Name" required
-                    class="w-1/2 p-2.5 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
-                <input type="text" name="nickname" placeholder="Nickname"
-                    class="w-1/2 p-2.5 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                <div class="w-1/2">
+                    <label class="text-xs font-semibold text-gray-600 ml-1">Full Name</label>
+                    <input type="text" name="name" placeholder="John Doe" required
+                        class="w-full mt-1 p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none transition">
+                </div>
+                <div class="w-1/2">
+                    <label class="text-xs font-semibold text-gray-600 ml-1">Nickname</label>
+                    <input type="text" name="nickname" placeholder="Johnny"
+                        class="w-full mt-1 p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none transition">
+                </div>
             </div>
 
-            <input type="text" name="username" placeholder="Username" required
-                class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+            <div>
+                <label class="text-xs font-semibold text-gray-600 ml-1">Username</label>
+                <input type="text" name="username" placeholder="johndoe123" required
+                    class="w-full mt-1 p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none transition">
+            </div>
 
-            <input type="email" name="email" placeholder="Email address" required
-                class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+            <div>
+                <label class="text-xs font-semibold text-gray-600 ml-1">Email</label>
+                <input type="email" name="email" placeholder="email@example.com" required
+                    class="w-full mt-1 p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none transition">
+            </div>
 
-            <input type="password" name="password" placeholder="New password" required
-                class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+            <div>
+                <label class="text-xs font-semibold text-gray-600 ml-1">Password</label>
+                <input type="password" name="password" placeholder="Min. 8 characters" required minlength="8"
+                    class="w-full mt-1 p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none transition">
+            </div>
 
-            <p class="text-[11px] text-gray-500">
-                By clicking Sign Up, you agree to our Terms and Data Policy.
+            <p class="text-[11px] text-gray-500 leading-tight">
+                By clicking Sign Up, you agree to our <a href="#" class="text-blue-600 hover:underline">Terms</a> and <a href="#" class="text-blue-600 hover:underline">Data Policy</a>.
             </p>
 
-            <div class="text-center">
+            <div class="pt-2">
                 <button type="submit" 
-                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-16 rounded-md text-lg transition duration-200 shadow-md">
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-lg transition duration-200 shadow-md active:scale-[0.98]">
                     Sign Up
                 </button>
             </div>
         </form>
+
+        <div class="mt-6 text-center border-t pt-4">
+            <p class="text-sm text-gray-600">
+                Already have an account? <a href="{{ url_for('auth.login') }}" class="text-blue-600 font-semibold hover:underline">Log In</a>
+            </p>
+        </div>
     </div>
 </div>
 {% endblock %}

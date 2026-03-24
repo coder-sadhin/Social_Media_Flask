@@ -13,28 +13,56 @@ auth = Blueprint("auth", __name__)
 @auth.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        name = request.form["name"]
-        username = request.form["username"]
-        email = request.form["email"]
-        password = request.form["password"]
+        # 1. Use .get() to avoid KeyErrors and .strip() to clean whitespace
+        name = request.form.get("name", "").strip()
+        nickname = request.form.get("nickname", "").strip()
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").lower().strip()
+        password = request.form.get("password")
 
-        existing = User.query.filter_by(email=email).first()
-        if existing:
-            flash("Email already exists")
+        # 2. Basic Validation: Ensure required fields aren't just empty spaces
+        if not all([name, username, email, password]):
+            flash("All required fields must be filled out.", "danger")
             return redirect(url_for("auth.register"))
 
-        user = User(
-            name=name,
-            username=username,
-            email=email,
-            password_hash=hash_password(password)
-        )
+        # 3. Check if Email OR Username already exists
+        user_by_email = User.query.filter_by(email=email).first()
+        user_by_username = User.query.filter_by(username=username).first()
 
-        db.session.add(user)
-        db.session.commit()
+        if user_by_email:
+            flash("That email is already registered. Please login.", "warning")
+            return redirect(url_for("auth.register"))
+        
+        if user_by_username:
+            flash("That username is already taken. Try another.", "warning")
+            return redirect(url_for("auth.register"))
 
-        flash("Account created successfully")
-        return redirect(url_for("auth.login"))
+        # 4. Create the User object
+        try:
+            user = User(
+                name=name,
+                nickname=nickname, # Added this since it's in your template
+                username=username,
+                email=email,
+                password_hash=hash_password(password)
+            )
+
+            db.session.add(user)
+            db.session.commit()
+
+            flash("Account created! You can now log in.", "success")
+            return redirect(url_for("auth.login"))
+
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
+            flash("A database error occurred. Please try again.", "danger")
+            return redirect(url_for("auth.register"))
+        except Exception as e:
+            db.session.rollback()
+            # Log the actual error for debugging
+            # current_app.logger.error(f"Registration Error: {e}")
+            flash("Something went wrong. Please try again later.", "danger")
+            return redirect(url_for("auth.register"))
 
     return render_template("auth/register.html")
 
