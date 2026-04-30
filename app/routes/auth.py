@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, session, request, current_app 
-from flask_login import login_user, logout_user, login_required
+from flask_login import current_user, login_user, logout_user, login_required
+import sqlalchemy
 from app.models.user import User
 from app import db
 from app.utils.security import hash_password, check_password
@@ -76,7 +77,7 @@ def login():
             remember = True if request.form.get("remember") else False
 
             login_user(user, remember=remember)
-            return redirect(url_for("main.home"))
+            return redirect(url_for("main.feed"))
 
         flash("Invalid credentials")
 
@@ -273,6 +274,6 @@ def change_password():
         db.session.commit()
 
         flash("Password changed successfully")
-        return redirect(url_for("main.home"))
+        return redirect(url_for("main.feed"))
 
     return render_template("auth/change_password.html")

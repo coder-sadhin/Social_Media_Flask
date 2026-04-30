@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-[1100px] mx-auto">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="h-40 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600"></div>
+        <div class="px-6 pb-6">
+            <div class="-mt-12 flex items-end justify-between gap-4">
+                <div class="flex items-end gap-4">
+                    <div class="w-24 h-24 rounded-2xl bg-white p-1 shadow-lg">
+                        <div class="w-full h-full rounded-2xl bg-gray-200 overflow-hidden flex items-center justify-center">
+                            {% if profile_user.profile_image and profile_user.profile_image != 'default.png' %}
+                                <img src="{{ url_for('static', filename='profile_pics/' + profile_user.profile_image) }}" class="w-full h-full object-cover">
+                            {% else %}
+                                <i class="fas fa-user text-gray-500 text-3xl"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="pb-2">
+                        <h1 class="text-2xl font-extrabold text-gray-900 leading-tight">{{ profile_user.name }}</h1>
+                        <div class="text-sm text-gray-500">@{{ profile_user.username }}</div>
+                    </div>
+                </div>
+
+                <div class="pb-2 flex items-center gap-2">
+                    <a href="{{ url_for('main.feed') }}" class="bg-gray-100 text-gray-800 font-semibold px-4 py-2 rounded-xl hover:bg-gray-200 transition">
+                        Back to feed
+                    </a>
+                    {% if is_me %}
+                        <a href="{{ url_for('auth.change_password') }}" class="bg-blue-600 text-white font-semibold px-4 py-2 rounded-xl hover:bg-blue-700 transition">
+                            Settings
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if profile_user.bio %}
+                <div class="mt-4 text-gray-700 whitespace-pre-wrap">{{ profile_user.bio }}</div>
+            {% else %}
+                <div class="mt-4 text-gray-400">No bio yet.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mt-6 grid grid-cols-12 gap-6">
+        <div class="col-span-12 lg:col-span-8 flex flex-col gap-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-extrabold text-gray-900">Posts</h2>
+            </div>
+
+            {% if posts and posts|length > 0 %}
+                {% for post in posts %}
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="p-4">
+                            <div class="text-xs text-gray-500">{{ post.date_posted.strftime('%b %d, %Y %I:%M %p') }}</div>
+                            {% if post.content %}
+                                <div class="mt-2 text-[15px] text-gray-800 whitespace-pre-wrap">{{ post.content }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center text-gray-500">
+                    No posts yet.
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-span-12 lg:col-span-4">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                <h3 class="font-bold text-gray-900 mb-3">About</h3>
+                <div class="text-sm text-gray-600">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-envelope text-gray-400"></i>
+                        <span>{{ profile_user.email }}</span>
+                    </div>
+                    {% if profile_user.nickname %}
+                        <div class="flex items-center gap-2 mt-2">
+                            <i class="fas fa-id-badge text-gray-400"></i>
+                            <span>{{ profile_user.nickname }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

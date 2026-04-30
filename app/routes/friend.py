@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, request, redirect, url_for, flash
 from flask_login import login_required, current_user
-from app.models.user import User
+from app import db
 from app.models.friendship import Friendship
 
 friend = Blueprint('friend', __name__, url_prefix='/friend')
@@ -12,7 +12,7 @@ friend = Blueprint('friend', __name__, url_prefix='/friend')
 def send_request(user_id):
     if user_id == current_user.id:
         flash("You cannot add yourself.", "danger")
-        return redirect(request.referrer or url_for("main.home"))
+        return redirect(request.referrer or url_for("main.feed"))
 
     # Check if any relationship already exists (pending or accepted)
     existing = Friendship.query.filter(
@@ -28,7 +28,7 @@ def send_request(user_id):
     else:
         flash("A request is already pending or you are already friends.", "info")
     
-    return redirect(request.referrer or url_for("main.home"))
+    return redirect(request.referrer or url_for("main.feed"))
 
 # 2. ACCEPT REQUEST (Using user_id is easier for the UI)
 @friend.route('/accept/<int:user_id>')
@@ -44,7 +44,7 @@ def accept_request(user_id):
     req.status = 'accepted'
     db.session.commit()
     flash("Friend request accepted!", "success")
-    return redirect(request.referrer or url_for("main.home"))
+    return redirect(request.referrer or url_for("main.feed"))
 
 # 3. REJECT / CANCEL / UNFRIEND (The "Remove" Logic)
 @friend.route('/remove/<int:user_id>')
@@ -61,4 +61,4 @@ def remove_friendship(user_id):
         db.session.commit()
         flash("Friendship or request removed.", "info")
     
-    return redirect(request.referrer or url_for("main.home"))
+    return redirect(request.referrer or url_for("main.feed"))

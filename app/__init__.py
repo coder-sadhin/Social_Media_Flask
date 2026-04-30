@@ -56,7 +56,7 @@ def create_app():
 
         # 2. If user is ALREADY logged in and tries to go to Login/Register
         if current_user.is_authenticated and request.endpoint in auth_routes:
-            return redirect(url_for('main.home')) # Redirect to their feed
+            return redirect(url_for('main.feed')) # Redirect to their feed
             
     # --- THE SECURITY GUARD END ---
 
